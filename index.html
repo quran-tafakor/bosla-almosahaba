@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوصلة المصاحبة | سور القرآن</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12332F;
+    --ink-soft:#1F4A44;
+    --paper:#F6F3EA;
+    --paper-card:#FFFFFF;
+    --line:#E4DFD0;
+    --gold:#B9863B;
+    --gold-deep:#8A621F;
+    --teal:#1F6E5E;
+    --teal-deep:#12433A;
+    --plum:#6B3B4A;
+    --plum-deep:#4A2733;
+    --amber:#B9863B;
+    --amber-deep:#7A5320;
+    --text-1:#1D2622;
+    --text-2:#5B655F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text-1);
+    font-family:'Tajawal',sans-serif;
+    line-height:1.8;
+  }
+  .quran{
+    font-family:'Amiri', serif;
+    font-weight:700;
+  }
+  header.top{
+    background:var(--ink);
+    color:#F6F3EA;
+    padding:2.4rem 1.5rem 2rem;
+    text-align:center;
+  }
+  header.top h1{
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 .4rem;
+    letter-spacing:.5px;
+  }
+  header.top p{
+    margin:0;
+    color:#C9CFC7;
+    font-size:14.5px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  main{
+    max-width:960px;
+    margin:0 auto;
+    padding:2rem 1.2rem 4rem;
+  }
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'Tajawal',sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:8px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    margin-bottom:1.4rem;
+  }
+  .back-btn:hover{ border-color:var(--gold); color:var(--gold-deep); }
+
+  /* ---- surah picker ---- */
+  .surah-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-bottom:2.2rem;
+  }
+  .surah-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:1.1rem 1.2rem;
+    cursor:pointer;
+    text-align:right;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .surah-card:hover{ border-color:var(--gold); transform:translateY(-2px); }
+  .surah-card.active{ border-color:var(--gold); box-shadow:0 0 0 1.5px var(--gold); }
+  .surah-card .name{
+    font-family:'Amiri',serif;
+    font-weight:700;
+    font-size:22px;
+    color:var(--ink);
+  }
+  .surah-card .meta{
+    font-size:12.5px;
+    color:var(--text-2);
+    margin-top:.3rem;
+  }
+  .surah-card .tag{
+    display:inline-block;
+    margin-top:.6rem;
+    font-size:11.5px;
+    color:var(--gold-deep);
+    background:#FBF2E3;
+    padding:2px 9px;
+    border-radius:20px;
+  }
+
+  /* ---- compass nav ---- */
+  .compass-wrap{
+    position:relative;
+    width:100%;
+    max-width:520px;
+    margin:1rem auto 2.2rem;
+    aspect-ratio:1/1;
+  }
+  .compass-ring{
+    position:absolute;
+    inset:8%;
+    border-radius:50%;
+    border:1px dashed var(--line);
+  }
+  .compass-hub{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:34%;
+    height:34%;
+    border-radius:50%;
+    background:var(--ink);
+    color:#F6F3EA;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:.5rem;
+  }
+  .compass-hub .hub-name{
+    font-family:'Amiri',serif;
+    font-weight:700;
+    font-size:clamp(26px,6vw,38px);
+  }
+  .compass-hub .hub-sub{
+    font-size:13px;
+    color:#C9CFC7;
+    margin-top:.3rem;
+  }
+  .compass-node{
+    position:absolute;
+    width:78px;
+    height:78px;
+    margin-left:-39px;
+    margin-top:-39px;
+    border-radius:50%;
+    background:var(--paper-card);
+    border:2.5px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6px;
+    cursor:pointer;
+    font-size:10.5px;
+    color:var(--text-2);
+    transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease, background .15s ease;
+  }
+  .compass-node .mono{
+    font-family:'Amiri',serif;
+    font-weight:700;
+    font-size:16px;
+    color:var(--ink);
+    margin-bottom:2px;
+  }
+  .compass-node.group-teal{ border-color:var(--teal); background:#EAF3F0; }
+  .compass-node.group-amber{ border-color:var(--amber); background:#FBF2E3; }
+  .compass-node.group-plum{ border-color:var(--plum); background:#F6EBEE; }
+  .compass-node.active.group-teal{ box-shadow:0 0 0 3px #CFE3DD; background:#DCEEE7; }
+  .compass-node.active.group-amber{ box-shadow:0 0 0 3px #EFDBB8; background:#F7E7C7; }
+  .compass-node.active.group-plum{ box-shadow:0 0 0 3px #E3CCD3; background:#EEDCE1; }
+  .compass-node.active{ transform:scale(1.16); z-index:2; }
+  .compass-node:hover{ transform:scale(1.08); }
+  .compass-node.active:hover{ transform:scale(1.16); }
+  .compass-node.active .mono{ color:var(--ink); }
+  .compass-node span.label{
+    line-height:1.25;
+    font-weight:500;
+  }
+
+  .legend{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:12px;
+    color:var(--text-2);
+    margin:-1rem 0 2rem;
+  }
+  .legend i{
+    display:inline-block;
+    width:9px; height:9px;
+    border-radius:50%;
+    margin-left:5px;
+    vertical-align:middle;
+  }
+  .legend .d-teal{ background:var(--teal); }
+  .legend .d-amber{ background:var(--amber); }
+  .legend .d-plum{ background:var(--plum); }
+
+  /* ---- content panel ---- */
+  .panel{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:1.6rem 1.6rem 1.8rem;
+  }
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line);
+    padding-bottom:.8rem;
+    margin-bottom:1.2rem;
+  }
+  .panel-head h2{
+    font-size:18px;
+    font-weight:700;
+    margin:0;
+    color:var(--ink);
+  }
+  .panel-head .count{
+    font-size:12px;
+    color:var(--text-2);
+  }
+  .entry{
+    padding:1rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .entry:last-child{ border-bottom:none; padding-bottom:0; }
+  .entry .ayah{
+    font-family:'Amiri',serif;
+    font-size:19px;
+    color:var(--teal-deep);
+    margin:0 0 .5rem;
+  }
+  .entry .ayah .ref{
+    font-family:'Tajawal',sans-serif;
+    font-size:12px;
+    color:var(--gold-deep);
+    font-weight:500;
+  }
+  .entry .heading{
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--text-1);
+    margin:0 0 .3rem;
+  }
+  .entry .body{
+    font-size:14.5px;
+    color:var(--text-1);
+    margin:0 0 .5rem;
+  }
+  .entry .src{
+    font-size:11.5px;
+    color:var(--text-2);
+  }
+  .entry .src::before{
+    content:"المصدر: ";
+    color:var(--text-2);
+  }
+  .entry .advice{
+    font-weight:700;
+    font-size:14px;
+    color:var(--gold-deep);
+    background:#FBF2E3;
+    display:inline-block;
+    padding:.4rem .7rem;
+    border-radius:8px;
+    margin:.2rem 0 .6rem;
+  }
+  .emotion-block{
+    background:#F6EBEE;
+    border-radius:10px;
+    padding:.9rem 1rem;
+    margin-bottom:.8rem;
+  }
+  .emotion-block .who{
+    font-size:12.5px;
+    color:var(--plum-deep);
+    font-weight:700;
+    margin-bottom:.3rem;
+  }
+  footer.note{
+    text-align:center;
+    font-size:12px;
+    color:var(--text-2);
+    margin-top:2rem;
+    padding-top:1rem;
+    border-top:1px dashed var(--line);
+  }
+  @media (max-width:480px){
+    .compass-node{ width:64px; height:64px; margin-left:-32px; margin-top:-32px; font-size:9px;}
+    .compass-node .mono{ font-size:14px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>بوصلة المصاحبة</h1>
+  <p>مبادرة مصاحبة سور القرآن — كل سورة بيتفتح فيها أحد عشر بابًا للتدبر، مبنية من مصادر تفسير أهل السنة الموثوقة.</p>
+</header>
+
+<main>
+  <div id="listView">
+    <div class="surah-grid" id="surahGrid"></div>
+  </div>
+  <div id="detailView" style="display:none;">
+    <button class="back-btn" id="backBtn">→ رجوع لكل السور</button>
+    <div id="compassArea"></div>
+    <div class="panel" id="panelArea"></div>
+  </div>
+
+  <footer class="note">
+    المحتوى مبني على: تفسير ابن كثير، تفسير الطبري، أسباب النزول للواحدي، التحرير والتنوير لابن عاشور، أيسر التفاسير لأبي بكر الجزائري، زاد المسير لابن الجوزي، صحيح مسلم بشرح النووي، وأقوال شيخ الإسلام ابن تيمية. راجعي أي إضافة جديدة مع مصدرها قبل النشر.
+  </footer>
+</main>
+
+<script>
+const CATEGORIES = [
+  {id:"mawaqef", label:"بوصلة المواقف", group:"teal"},
+  {id:"akhlaq", label:"الأخلاقيات", group:"amber"},
+  {id:"mubadarat", label:"المبادرات", group:"amber"},
+  {id:"tawjih", label:"ضبط الوجهة", group:"amber"},
+  {id:"tashbihat", label:"بنك التشبيهات", group:"teal"},
+  {id:"lawTakallamat", label:"لو السورة اتكلمت", group:"teal"},
+  {id:"khareetat", label:"خريطة العواطف", group:"teal"},
+  {id:"lastWord", label:"لو كانت آخر سورة", group:"teal"},
+  {id:"sada", label:"صدى السورة في القرآن", group:"plum"},
+  {id:"nuzul", label:"الزمن وسبب النزول", group:"plum"},
+  {id:"ahadith", label:"أحاديث مرتبطة", group:"plum"},
+  {id:"lughawiyyat", label:"اللغويات", group:"plum"},
+  {id:"seerah", label:"ربط بالسيرة والحياة", group:"plum"},
+];
+
+const SURAHS = [
+  {
+    id:"qaf",
+    name:"ق",
+    meaning:"مكية، من المفصّل، 45 آية",
+    tag:"سورة ق",
+    sections:{
+      mawaqef:[
+        {ayah:"أَإِذَا مِتْنَا وَكُنَّا تُرَابًا ۖ ذَٰلِكَ رَجْعٌ بَعِيدٌ", ref:"ق: 3",
+         heading:"لما نستبعد رجوع الحياة بعد ما نحس إن مرحلة معينة خلصت خالص",
+         body:"المشركون استبعدوا البعث لمجرد إنه بعيد عن تصورهم، فرد الله عليهم بمشهد الأرض الميتة اللي بتحيا بالزرع كل سنة (ق: 9-11) — نفس المنطق بيتكرر في حياة أي حد: أي مرحلة حسّها الإنسان إنها 'خلصت' ومفيش رجوع منها، ممكن تتفاجئه إنها ترجع بشكل تاني تمامًا.",
+         advice:"لا تحكم على أي مرحلة بالنهاية القطعية — القدرة اللي أحيت الأرض قادرة على أي إحياء جديد.",
+         src:"تفسير ابن كثير"},
+        {ayah:"بَلْ عَجِبُوا أَنْ جَاءَهُمْ مُنْذِرٌ مِنْهُمْ", ref:"ق: 2",
+         heading:"لما نستغرب إن النصيحة تيجي من حد 'زينا بالظبط'",
+         body:"استغراب قريش إن الرسول بشر منهم، مش ملك ولا شخصية استثنائية. نفس الإحساس بيتكرر لما ييجي التوجيه من زميل أو حد قريب بنفس الظروف — بيبان أقل 'قيمة' مع إنه أصدق لأنه عايش نفس التجربة.",
+         advice:"مصدر النصيحة مش مقياس صحتها — احكم على الكلام نفسه مش على شكل اللي قاله.",
+         src:"مقاصد سورة ق — ابن عاشور"},
+        {ayah:"وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ", ref:"ق: 16",
+         heading:"لحظات الوحدة والشدة اللي بيحس فيها الإنسان إن محدش حاسس بيه",
+         body:"ابن كثير فسّرها بقرب ملائكته سبحانه من الإنسان أقرب من عرق رقبته. اللحظة اللي بيحس فيها حد إنه لوحده تمامًا في هم أو قرار صعب، هي نفسها اللحظة اللي القرب الإلهي فيها أوضح ما يكون.",
+         advice:"لما تحس بالوحدة، فكّر إن القرب ده مش مشروط بحد حواليك يحس بيك.",
+         src:"تفسير ابن كثير"},
+        {ayah:"وَجَاءَتْ كُلُّ نَفْسٍ مَعَهَا سَائِقٌ وَشَهِيدٌ", ref:"ق: 21",
+         heading:"الشعور إن مجهود اتعمل اتنسى أو محدش لاحظه",
+         body:"السورة بتأكد إن كل قول وعمل متسجل ومحفوظ (ق: 17-18)، حتى اللي بيحس الإنسان إنه اتنسى أو مالوش قيمة. ده بيدي طمأنينة لمين بيتعب في حاجة محدش شايفها.",
+         advice:"استمر في المجهود اللي محدش شايفه — مفيش حاجة بتضيع فعليًا.",
+         src:"تفسير الطبري"}
+      ],
+      akhlaq:[
+        {ayah:"فَاصْبِرْ عَلَىٰ مَا يَقُولُونَ", ref:"ق: 39",
+         heading:"الصبر على كلام الناس",
+         body:"الأمر بالصبر جه بعد ما وصفت السورة تكذيب الأمم للرسل، وربطته مباشرة بالتسبيح (ق: 39-40) — يعني الصبر مش سلبي، لكنه مقرون بذكر فعلي في أوقات محددة.",
+         advice:"اجعل الصبر مقرون بفعل ثابت (ذكر أو عمل)، مش انتظار سلبي.",
+         src:"تفسير ابن كثير"},
+        {ayah:"وَمَا أَنْتَ عَلَيْهِمْ بِجَبَّارٍ", ref:"ق: 45",
+         heading:"الدعوة بالتذكير لا بالإجبار",
+         body:"حتى الرسول صلى الله عليه وسلم أُمر إنه يذكّر بس مش يفرض. أي مبادرة أو نصيحة بتتقدّم للناس، الخلق ده بيوجهها: العرض والتفكير، مش الفرض.",
+         advice:"اعرض الفكرة وسيبها، متضغطش عشان تتقبل فورًا.",
+         src:"التحرير والتنوير — ابن عاشور"},
+        {ayah:"مَا يَلْفِظُ مِنْ قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ", ref:"ق: 18",
+         heading:"مراقبة اللسان",
+         body:"كل كلمة بتتقال متسجلة، وده خلق مباشر: التحرّي قبل الكلام مش بس قبل الفعل.",
+         advice:"راجع الكلمة قبل ما تقولها، مش بعد ما تندم عليها.",
+         src:"تفسير الطبري"},
+        {ayah:"مَنْ خَشِيَ الرَّحْمَٰنَ بِالْغَيْبِ وَجَاءَ بِقَلْبٍ مُنِيبٍ", ref:"ق: 33",
+         heading:"الخشية في السر لا في العلن",
+         body:"الخشية المطلوبة هنا خشية 'بالغيب' — يعني وقت محدش شايف، وده معيار حقيقي للإخلاص.",
+         advice:"قيّم التزامك بأدائك وقت محدش شايفك، مش وقت الناس بتراقب.",
+         src:"تفسير ابن كثير"}
+      ],
+      mubadarat:[
+        {ayah:"فَسَبِّحْ بِحَمْدِ رَبِّكَ قَبْلَ طُلُوعِ الشَّمْسِ وَقَبْلَ الْغُرُوبِ", ref:"ق: 39",
+         heading:"مبادرة التسبيح المرتبط بأوقات محددة",
+         body:"السورة بتحدد أوقات فعلية: قبل الشروق، قبل الغروب، وأدبار السجود، ومن الليل (ق: 39-40) — مش دعوة عامة للذكر، لكن نظام يومي واضح ممكن أي حد يتبناه بسهولة.",
+         src:"تفسير ابن كثير"},
+        {ayah:"فَذَكِّرْ بِالْقُرْآنِ مَنْ يَخَافُ وَعِيدِ", ref:"ق: 45",
+         heading:"مبادرة التذكير الموجّه",
+         body:"التذكير هنا موجّه لمين قلبه مهيأ يستقبل (من يخاف وعيد)، مش تذكير عشوائي — يعني اختيار الوقت والشخص المناسب بحكمة.",
+         src:"تفسير ابن كثير"},
+        {ayah:"إِنَّ فِي ذَٰلِكَ لَذِكْرَىٰ لِمَنْ كَانَ لَهُ قَلْبٌ أَوْ أَلْقَى السَّمْعَ وَهُوَ شَهِيدٌ", ref:"ق: 37",
+         heading:"مبادرة الحضور القلبي وقت القراءة",
+         body:"مش أي استماع بينفع، لكن استماع بقلب حاضر. مبادرة عملية: قبل قراءة أو سماع القرآن، وقفة بسيطة لحضور القلب.",
+         src:"التحرير والتنوير — ابن عاشور"}
+      ],
+      tawjih:[
+        {ayah:"وَلَقَدْ خَلَقْنَا الْإِنْسَانَ وَنَعْلَمُ مَا تُوَسْوِسُ بِهِ نَفْسُهُ وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ", ref:"ق: 16",
+         heading:"استحضار القرب الدائم في السر والعلن",
+         body:"الآية بتجمع بين قرب الله من الإنسان (أقرب من عرق رقبته) وعلمه بحديث النفس والوسوسة الداخلية — يعني المراقبة هنا مش بس للفعل الظاهر، لكن للنية قبل ما تتحول لفعل.",
+         src:"تفسير ابن كثير، تفسير الطبري"},
+        {ayah:"وَأُزْلِفَتِ الْجَنَّةُ لِلْمُتَّقِينَ غَيْرَ بَعِيدٍ ۖ هَٰذَا مَا تُوعَدُونَ لِكُلِّ أَوَّابٍ حَفِيظٍ", ref:"ق: 31-32",
+         heading:"الجنة موعودة لمن يرجع باستمرار لا لمن لا يخطئ أبدًا",
+         body:"الوعد هنا لـ'الأوّاب' — أي كثير الرجوع والتوبة — مش لمن لم يخطئ يومًا. توجيه لضبط الوجهة بالاستمرار في الرجوع، مش بانتظار الكمال.",
+         src:"تفسير ابن كثير"},
+        {ayah:"لَقَدْ كُنْتَ فِي غَفْلَةٍ مِنْ هَٰذَا فَكَشَفْنَا عَنْكَ غِطَاءَكَ فَبَصَرُكَ الْيَوْمَ حَدِيدٌ", ref:"ق: 22",
+         heading:"استباق الغفلة قبل فوات الأوان",
+         body:"المشهد بيوصف لحظة يوم القيامة اللي فيها يتضح كل شيء بعد ما كان الإنسان غافل — دعوة لضبط الوجهة الآن قبل ما 'ينكشف الغطاء' بنفسه.",
+         src:"تفسير ابن كثير"}
+      ],
+      tashbihat:[
+        {ayah:"وَأَحْيَيْنَا بِهِ بَلْدَةً مَيْتًا ۚ كَذَٰلِكَ الْخُرُوجُ", ref:"ق: 11",
+         heading:"مقارنة مع سورة يس",
+         body:"سورة ق بتثبت البعث بمشهد الأرض الميتة اللي بتحيا بالمطر والزرع، وده نفس الأسلوب في سورة يس (يس: 77-79) لكن سورة يس بتضيف عليه قصة الرجل اللي جادل بعظم بالٍ — يعني ق بتكتفي بالدليل الكوني المباشر، ويس بتضيف مثال جدلي شخصي لنفس الفكرة.",
+         src:"مقارنة بين التفاسير"},
+        {ayah:"كَذَّبَتْ قَبْلَهُمْ قَوْمُ نُوحٍ وَأَصْحَابُ الرَّسِّ وَثَمُودُ", ref:"ق: 12",
+         heading:"مقارنة مع سورة الشعراء وهود",
+         body:"قصص الأمم المهلكة هنا مذكورة بالاسم فقط في سطرين (ق: 12-14) كتذكير سريع في سياق خطبة، بينما نفس القصص مفصلة بحوارها وأحداثها في سورة الشعراء وهود — فرق السياق بين 'التذكير المكثف' و'العرض القصصي المطوّل'.",
+         src:"مقاصد سورة ق — ابن عاشور"},
+        {ayah:"إِذْ يَتَلَقَّى الْمُتَلَقِّيَانِ عَنِ الْيَمِينِ وَعَنِ الشِّمَالِ قَعِيدٌ", ref:"ق: 17",
+         heading:"مقارنة مع سورة الانفطار",
+         body:"فكرة الملكين الحافظين مذكورة هنا بالتركيز على تسجيل كل لفظ لحظيًا، بينما في سورة الانفطار (الانفطار: 10-12) التركيز على صفتهم كـ'كرامًا كاتبين' — نفس الفكرة بزاوية مختلفة شوية.",
+         src:"مقارنة بين التفاسير"}
+      ],
+      lawTakallamat:[
+        {ayah:"وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ", ref:"ق: 16", heading:"", body:"", src:"تفسير ابن كثير"},
+        {ayah:"وَجَاءَتْ سَكْرَةُ الْمَوْتِ بِالْحَقِّ ۖ ذَٰلِكَ مَا كُنْتَ مِنْهُ تَحِيدُ", ref:"ق: 19", heading:"", body:"", src:"تفسير الطبري"},
+        {ayah:"إِنَّ فِي ذَٰلِكَ لَذِكْرَىٰ لِمَنْ كَانَ لَهُ قَلْبٌ أَوْ أَلْقَى السَّمْعَ وَهُوَ شَهِيدٌ", ref:"ق: 37", heading:"", body:"", src:"التحرير والتنوير — ابن عاشور"},
+        {ayah:"وَمَا أَنْتَ عَلَيْهِمْ بِجَبَّارٍ ۖ فَذَكِّرْ بِالْقُرْآنِ مَنْ يَخَافُ وَعِيدِ", ref:"ق: 45", heading:"", body:"", src:"تفسير ابن كثير"}
+      ],
+      khareetat:[
+        {who:"لمن يحس بخوف من الموت أو فقد حد قريب", ayah:"وَجَاءَتْ سَكْرَةُ الْمَوْتِ بِالْحَقِّ ۖ ذَٰلِكَ مَا كُنْتَ مِنْهُ تَحِيدُ", ref:"ق: 19",
+         body:"السورة مش بتهرب من مشهد سكرات الموت، لكن بتواجهه كحقيقة ('ذلك ما كنت منه تحيد' — أي تهرب) وتربطه فورًا بالاستعداد، مش باليأس."},
+        {who:"لمن يحس إنه لوحده في موقف بيتحاسب عليه", ayah:"وَجَاءَتْ كُلُّ نَفْسٍ مَعَهَا سَائِقٌ وَشَهِيدٌ", ref:"ق: 21",
+         body:"ولا نفس بتدخل الموقف لوحدها فعليًا؛ كل حاجة اتعملت متسجلة وشاهدة، فمفيش 'ضياع' لمجهود حتى لو حسّ صاحبه إنه مالوش قيمة."},
+        {who:"لمن يحس إن قلبه ما بيتأثرش زي الأول", ayah:"إِنَّ فِي ذَٰلِكَ لَذِكْرَىٰ لِمَنْ كَانَ لَهُ قَلْبٌ أَوْ أَلْقَى السَّمْعَ وَهُوَ شَهِيدٌ", ref:"ق: 37",
+         body:"السورة بتوضح إن الانتفاع مش بس بالسمع لكن بحضور القلب — إشارة لطيفة إن ضعف التأثر مش نهاية الطريق، لكن دعوة لتجديد الحضور."}
+      ],
+      lastWord:[
+        {heading:"لو سورة ق كانت آخر حاجة هتتقرأ في حياتك", 
+         body:"أقوى حاجة السورة عايزة توصلها بعد كل التفاصيل: القرب مستمر ('ونحن أقرب إليه من حبل الوريد' — ق:16)، واللحظة اللي هتيجي حتمًا (سكرة الموت — ق:19) محتاجة استعداد يومي بسيط: تسبيح، صبر، وحضور قلب، مش تأجيل. آخر آية في السورة بتلخص المطلوب: تذكير لمن قلبه مستعد يخاف ويستجيب (ق:45) — فالسؤال الحقيقي مش 'هل السورة وصلت' لكن 'هل القلب حاضر يستقبلها'.",
+         src:"تأمل شخصي مبني على معاني السورة (ق: 16، 19، 45) — وليس نقلًا عن تفسير بعينه"}
+      ],
+      sada:[
+        {theme:"القرين (الملك الموكل أو الشيطان المصاحب)",
+         occurrences:"ورد اللفظ في القرآن ثماني مرات (سبع بصيغة المفرد ومرة بصيغة الجمع 'قرناء')، منها: ق: 27، الزخرف: 36 و38، النساء: 38، فصلت: 25، الصافات: 51.",
+         insight:"تكرار الفكرة في مواضع متفرقة بيؤكد إن مفهوم 'المرافقة الدائمة' — سواء بملك يسجل أو شيطان يزين — مش فكرة عابرة، لكن حقيقة ثابتة عن كل إنسان.",
+         src:"قصة الإسلام — معجزة القرآن، بالرجوع لتفسير الطبري"},
+        {theme:"تسجيل الأعمال والشهادة عليها (سائق وشهيد)",
+         occurrences:"نفس المعنى بيتكرر بصور مختلفة في سور تانية: الانفطار: 10-12 (وإن عليكم لحافظين كرامًا كاتبين)، الزلزلة: 7-8 (فمن يعمل مثقال ذرة خيرًا يره)، الإسراء: 14 (اقرأ كتابك كفى بنفسك اليوم عليك حسيبًا).",
+         insight:"سورة ق بتضيف تفصيلة مميزة: مش بس تسجيل، لكن 'سوق' فعلي للنفس يوم القيامة — صورة حركية أقوى من مجرد وجود سجل.",
+         src:"مقارنة بين التفاسير"},
+        {theme:"إحياء الأرض الميتة دليلًا على البعث",
+         occurrences:"نفس الاستدلال بمشهد المطر والنبات بيتكرر في: الروم: 50، فصّلت: 39، الحج: 5، يس: 33.",
+         insight:"تكرار نفس الدليل الحسي في عدة سور بيوضح إنه من أقوى الأدلة العقلية اللي القرآن بيعتمد عليها في إثبات البعث — مش دليل اتقال مرة واحدة وانتهى.",
+         src:"مقارنة بين التفاسير"}
+      ],
+      nuzul:[
+        {heading:"زمن النزول", body:"سورة مكية بإجماع أغلب المفسرين، باستثناء الآية 38 فقيل إنها مدنية لتعلقها بمحاورة مع اليهود. نزلت في فترة كان التركيز فيها على قضايا العقيدة الأساسية: التوحيد وإثبات البعث، لأن مشركي مكة كانوا يستبعدون الحياة بعد الموت عقليًا.", src:"تفسير ابن كثير، أيسر التفاسير — الجزائري، مقاصد سورة ق — ابن عاشور"},
+        {heading:"سبب نزول آية 38", ayah:"وَلَقَدْ خَلَقْنَا السَّمَاوَاتِ وَالْأَرْضَ وَمَا بَيْنَهُمَا فِي سِتَّةِ أَيَّامٍ وَمَا مَسَّنَا مِنْ لُغُوبٍ", ref:"ق: 38",
+         body:"روى ابن جرير الطبري عن ابن عباس رضي الله عنهما إن اليهود سألوا النبي ﷺ عن خلق السماوات والأرض فأخبرهم بترتيب أيام الخلق، فلما وصل لليوم السابع قالوا 'ثم استراح' — أي نسبوا لله التعب والحاجة للراحة — فغضب النبي ﷺ غضبًا شديدًا فنزلت الآية ردًا عليهم. وذكر نفس السبب الواحدي في كتاب أسباب النزول عن الحسن وقتادة.",
+         src:"تفسير الطبري، أسباب النزول للواحدي"},
+        {heading:"قصة مرتبطة بالسورة", body:"روت أم هشام بنت حارثة بن النعمان رضي الله عنها إنها ما حفظت سورة ق إلا من فم رسول الله ﷺ نفسه، لأنه كان يقرأ بها على المنبر كل جمعة، وكان تنورها هي وتنور بيت رسول الله ﷺ واحدًا — يعني كانت جارة قريبة جدًا من بيته. القصة دي بتبين إزاي السورة كانت جزء متكرر من حياة الصحابة الأسبوعية، مش نص بيتقرأ مرة واحدة وخلاص.", src:"صحيح مسلم"}
+      ],
+      ahadith:[
+        {heading:"حديث أم هشام بنت حارثة", body:"'ما حفظتُ ق والقرآن المجيد إلا عن لسان رسول الله ﷺ، يخطب بها كل جمعة'. رواه مسلم في صحيحه (كتاب الجمعة).", src:"صحيح مسلم"},
+        {heading:"شرح النووي لسبب اختيار السورة للجمعة", body:"ذكر الإمام النووي في شرح صحيح مسلم إن سبب اختيار النبي ﷺ لسورة ق في خطبة الجمعة هو اشتمالها على إثبات البعث والموت والمواعظ الشديدة، وفيه دليل على استحباب قراءتها أو بعضها في كل خطبة جمعة.", src:"شرح النووي على صحيح مسلم"},
+        {heading:"كلام ابن تيمية", body:"قال شيخ الإسلام ابن تيمية إن سورة ق كان النبي ﷺ يقرأ بها في الجمعة لأنها جامعة لإثبات النبوات والمعاد، وبيان حال متّبعي الأنبياء ومخالفيهم في الأمم السابقة.", src:"كلام ابن تيمية، نقلًا عن موقع الألوكة"}
+      ],
+      lughawiyyat:[
+        {word:"ق (حرف افتتاح السورة)", ref:"ق: 1", meaning:"ذكر ابن الجوزي في 'زاد المسير' خمسة أقوال في معناها: أنها قسم أقسم الله به وهو من أسمائه (رواية عن ابن عباس)، أو أنها اسم جبل، حتى إن بعض الروايات ذكرت إنه جبل محيط بالأرض تُحرَّك منه الزلازل — وهذه الأقوال من أقوال المفسرين في حروف الافتتاح المتشابهة، لا نص قطعي.", src:"زاد المسير — ابن الجوزي"},
+        {word:"لُغُوب", ref:"ق: 38", meaning:"التعب والإعياء، ونفيه عن الله جل جلاله جاء ردًا مباشرًا على زعم اليهود إنه سبحانه تعب من الخلق فاستراح.", src:"تفسير الطبري"},
+        {word:"مَريج", ref:"ق: 5", meaning:"مضطرب مختلط، من 'المرج' أي الخلط، ويصف حيرة المكذبين واختلاف أقوالهم في وصف النبي ﷺ (ساحر، شاعر، كاهن).", src:"تفسير ابن كثير"},
+        {word:"حفيظ", ref:"ق: 4", meaning:"اسم من الحفظ، والمقصود به اللوح المحفوظ الذي يُحفظ فيه كل شيء مقدّر.", src:"تفسير ابن كثير"},
+        {word:"رواسي", ref:"ق: 7", meaning:"جمع راسية، أي الجبال الثابتة الراسخة التي تمنع اضطراب الأرض.", src:"تفسير الطبري"},
+        {word:"حبل الوريد", ref:"ق: 16", meaning:"الوريد عرق في الرقبة قريب جدًا من القلب، وذكره تعبير عن غاية القرب لا قرب مسافة بس.", src:"تفسير ابن كثير"},
+        {word:"سائق وشهيد", ref:"ق: 21", meaning:"سائق يسوق النفس إلى موقف الحشر، وشهيد يشهد عليها بعملها، وكلاهما من الملائكة الموكلة بالإنسان.", src:"تفسير الطبري"},
+        {word:"قرين", ref:"ق: 23، 27", meaning:"الملازم الدائم، ويُطلق هنا على الملك الموكل بتسجيل العمل في سياق، وعلى الشيطان المصاحب في سياق آخر من السورة.", src:"تفسير ابن كثير"}
+      ],
+      seerah:[
+        {heading:"السورة في حياة الصحابة الأسبوعية", body:"كون النبي ﷺ كان يواظب على قراءة سورة ق كل جمعة على المنبر (حديث أم هشام) بيعلّمنا إن الارتباط بالقرآن مش مناسبة سنوية أو موسمية، لكن عادة أسبوعية ثابتة. تطبيق عملي: تخصيص سورة أو مقطع ثابت يتقرأ كل جمعة، زي ما كان النبي ﷺ يفعل.", src:"صحيح مسلم"},
+        {heading:"مواجهة التكذيب بالصبر لا بالانفعال", body:"السورة نزلت في سياق تكذيب ورفض شديد من مشركي مكة، ومع ده كان توجيه النبي ﷺ هو الصبر والتسبيح (ق: 39) مش الانفعال أو الإجبار (ق: 45). في أي موقف رفض أو نقد بيواجهه الإنسان في حياته أو دعوته، السيرة النبوية هنا بتدي نموذج عملي: الاستمرار في التذكير الهادئ، من غير فرض."}
+      ]
+    }
+  },
+  { id:"fatiha", name:"الفاتحة", meaning:"مكية، 7 آيات", tag:"سورة الفاتحة", sections:{} },
+  { id:"baqara", name:"البقرة", meaning:"مدنية، 286 آية", tag:"سورة البقرة", sections:{} },
+  { id:"al-imran", name:"آل عمران", meaning:"مدنية، 200 آية", tag:"سورة آل عمران", sections:{} },
+  { id:"yasin", name:"يس", meaning:"مكية، 83 آية", tag:"سورة يس", sections:{} },
+  { id:"waqia", name:"الواقعة", meaning:"مكية، 96 آية", tag:"سورة الواقعة", sections:{} },
+  { id:"mulk", name:"الملك", meaning:"مكية، 30 آية", tag:"سورة الملك", sections:{} },
+  { id:"kahf", name:"الكهف", meaning:"مكية، 110 آية", tag:"سورة الكهف", sections:{} },
+  { id:"maryam", name:"مريم", meaning:"مكية، 98 آية", tag:"سورة مريم", sections:{} },
+  { id:"yusuf", name:"يوسف", meaning:"مكية، 111 آية", tag:"سورة يوسف", sections:{} },
+  { id:"nur", name:"النور", meaning:"مدنية، 64 آية", tag:"سورة النور", sections:{} },
+  { id:"luqman", name:"لقمان", meaning:"مكية، 34 آية", tag:"سورة لقمان", sections:{} },
+  { id:"sajda", name:"السجدة", meaning:"مكية، 30 آية", tag:"سورة السجدة", sections:{} },
+  { id:"rahman", name:"الرحمن", meaning:"مختلف في مكيتها (الأشهر مكية)، 78 آية", tag:"سورة الرحمن", sections:{} },
+  { id:"hujurat", name:"الحجرات", meaning:"مدنية، 18 آية", tag:"سورة الحجرات", sections:{} },
+  { id:"duha", name:"الضحى", meaning:"مكية، 11 آية", tag:"سورة الضحى", sections:{} },
+  { id:"ikhlas", name:"الإخلاص", meaning:"مكية، 4 آيات", tag:"سورة الإخلاص", sections:{} }
+];
+
+let activeSurah = SURAHS[0];
+let activeCategory = "mawaqef";
+let currentView = "list";
+
+function renderSurahGrid(){
+  const grid = document.getElementById("surahGrid");
+  grid.innerHTML = "";
+  SURAHS.forEach(s=>{
+    const card = document.createElement("div");
+    card.className = "surah-card";
+    card.innerHTML = `<div class="name">${s.name}</div><div class="meta">${s.meaning}</div><div class="tag">${s.tag}</div>`;
+    card.onclick = ()=>{ activeSurah = s; activeCategory = "mawaqef"; currentView = "detail"; renderAll(); window.scrollTo(0,0); };
+    grid.appendChild(card);
+  });
+}
+
+function renderCompass(){
+  const area = document.getElementById("compassArea");
+  const size = 520;
+  const cx = size/2, cy = size/2;
+  const radius = size*0.36;
+  let nodes = "";
+  CATEGORIES.forEach((c,i)=>{
+    const angle = (Math.PI*2*i/CATEGORIES.length) - Math.PI/2;
+    const x = cx + radius*Math.cos(angle);
+    const y = cy + radius*Math.sin(angle);
+    nodes += `<div class="compass-node group-${c.group}${c.id===activeCategory?" active":""}"
+      style="left:${x}px; top:${y}px;" data-id="${c.id}">
+      <span class="label">${c.label}</span>
+    </div>`;
+  });
+  area.innerHTML = `
+    <div class="compass-wrap" style="max-width:${size}px;">
+      <div class="compass-ring"></div>
+      <div class="compass-hub">
+        <div class="hub-name">${activeSurah.name}</div>
+        <div class="hub-sub">اختر بابًا للتدبر</div>
+      </div>
+      ${nodes}
+    </div>
+    <div class="legend">
+      <span><i class="d-teal"></i>تأمل ومشاعر</span>
+      <span><i class="d-amber"></i>سلوك وتطبيق</span>
+      <span><i class="d-plum"></i>مرجعي وعلمي</span>
+    </div>`;
+  area.querySelectorAll(".compass-node").forEach(n=>{
+    n.onclick = ()=>{ activeCategory = n.dataset.id; renderAll(); };
+  });
+}
+
+function entryHTML(e){
+  let html = `<div class="entry">`;
+  if(e.ayah){ html += `<p class="ayah">${e.ayah} <span class="ref">— ${e.ref}</span></p>`; }
+  if(e.heading){ html += `<p class="heading">${e.heading}</p>`; }
+  if(e.body){ html += `<p class="body">${e.body}</p>`; }
+  if(e.advice){ html += `<p class="advice">${e.advice}</p>`; }
+  if(e.src){ html += `<p class="src">${e.src}</p>`; }
+  html += `</div>`;
+  return html;
+}
+
+function renderPanel(){
+  const panel = document.getElementById("panelArea");
+  const cat = CATEGORIES.find(c=>c.id===activeCategory);
+  const items = activeSurah.sections[activeCategory] || [];
+  let body = "";
+
+  if(activeCategory === "khareetat"){
+    body = items.map(e=>`
+      <div class="emotion-block">
+        <div class="who">${e.who}</div>
+        <p class="ayah">${e.ayah} <span class="ref">— ${e.ref}</span></p>
+        <p class="body">${e.body}</p>
+      </div>`).join("");
+  } else if(activeCategory === "lughawiyyat"){
+    body = items.map(e=>`
+      <div class="entry">
+        <p class="heading">${e.word} <span class="ref" style="margin-right:6px">(${e.ref})</span></p>
+        <p class="body">${e.meaning}</p>
+        <p class="src">${e.src}</p>
+      </div>`).join("");
+  } else if(activeCategory === "sada"){
+    body = items.map(e=>`
+      <div class="entry">
+        <p class="heading">${e.theme}</p>
+        <p class="body">${e.occurrences}</p>
+        <p class="body">${e.insight}</p>
+        <p class="src">${e.src}</p>
+      </div>`).join("");
+  } else {
+    body = items.map(entryHTML).join("");
+  }
+
+  panel.innerHTML = `
+    <div class="panel-head">
+      <h2>${cat.label} — ${activeSurah.tag}</h2>
+      <span class="count">${items.length} عنصر</span>
+    </div>
+    ${body || '<p class="body">لسه مفيش محتوى مضاف هنا.</p>'}
+  `;
+}
+
+function renderAll(){
+  document.getElementById("listView").style.display = currentView==="list" ? "block":"none";
+  document.getElementById("detailView").style.display = currentView==="detail" ? "block":"none";
+  renderSurahGrid();
+  if(currentView==="detail"){
+    renderCompass();
+    renderPanel();
+  }
+}
+
+document.getElementById("backBtn").onclick = ()=>{ currentView = "list"; renderAll(); window.scrollTo(0,0); };
+
+renderAll();
+</script>
+</body>
+</html>
